@@ -22,7 +22,11 @@ function TaserReporter(baseReporterDecorator, config) {
     function onBrowserStart(browser) {
         console.log('Browser attached: ', browser);
         browsers[browser.id] = {
-            results: []
+            browser: {
+                name: browser.name,
+                fullName: browser.fullName
+            },
+            testResults: []
         };
     }
     
@@ -30,16 +34,19 @@ function TaserReporter(baseReporterDecorator, config) {
         console.log('Browser error: ', arguments);
     }
 
-    function onSpecComplete(browser, result) {
-        browsers[browser.id].results.push(result);
-        taserReporter({ onSpecComplete: { browser: browser, result: result } });
+    function onSpecComplete(browser, testResult) {
+        browsers[browser.id].testResults.push(testResult);
     }
 
     function onRunComplete(browser, result) {
-        console.log('Run complete');
-        console.log('Browser results: ', browser.getResults());
-        console.log('Taser results: ', browsers);
-        taserReporter({ onRunComplete: { browser: browser, result: result } });
+        var reports = [];
+        var browser;
+        
+        for( browser in browsers ) {
+            reports.push(browsers[browser]);
+        }
+        
+        taserReporter(reports);
     }
 }
 

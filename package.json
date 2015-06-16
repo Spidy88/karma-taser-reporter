@@ -1,0 +1,24 @@
+{
+  "name": "karma-taser-reporter",
+  "version": "1.0.0",
+  "description": "Karma reporter for Taser formatted reports",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Spidy88/karma-taser-reporter.git"
+  },
+  "keywords": [
+    "karma-plugin",
+    "karma-reporter",
+    "taser"
+  ],
+  "author": "Nick Ferraro <nick.ferraro@hackreactor.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Spidy88/karma-taser-reporter/issues"
+  },
+  "homepage": "https://github.com/Spidy88/karma-taser-reporter"
+}

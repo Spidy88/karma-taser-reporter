@@ -15,12 +15,10 @@ function TaserReporter(baseReporterDecorator, config) {
     this.onRunComplete = onRunComplete.bind(this);
 
     function onRunStart() {
-        console.log('Starting new run');
         browsers = {};
     }
     
     function onBrowserStart(browser) {
-        console.log('Browser attached: ', browser);
         browsers[browser.id] = {
             browser: {
                 name: browser.name,

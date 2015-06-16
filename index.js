@@ -4,17 +4,42 @@ function TaserReporter(baseReporterDecorator, config) {
     // extend the base reporter
     baseReporterDecorator(this);
 
-    var taser = config.taser || function(msg) { console.log('Taser message: ', msg); };
+    var taserReporter = config.taserReporter || function() {};
+    var browsers = {};
 
-    this.onSpecComplete = onSpecComplete;
-    this.onRunComplete = onRunComplete;
+    // This is not a full list of events that can be listened for, only the set we currently care about
+    this.onRunStart = onRunStart.bind(this);
+    this.onBrowserStart = onBrowserStart.bind(this);
+    this.onBrowserError = onBrowserError.bind(this);
+    this.onSpecComplete = onSpecComplete.bind(this);
+    this.onRunComplete = onRunComplete.bind(this);
+
+    function onRunStart() {
+        console.log('Starting new run');
+        browsers = {};
+    }
+    
+    function onBrowserStart(browser) {
+        console.log('Browser attached: ', browser);
+        browsers[browser.id] = {
+            results: []
+        };
+    }
+    
+    function onBrowserError() {
+        console.log('Browser error: ', arguments);
+    }
 
     function onSpecComplete(browser, result) {
-        taser({ onSpecComplete: { browser: browser, result: result } });
+        browsers[browser.id].results.push(result);
+        taserReporter({ onSpecComplete: { browser: browser, result: result } });
     }
 
     function onRunComplete(browser, result) {
-        taser({ onRunComplete: { browser: browser, result: result } });
+        console.log('Run complete');
+        console.log('Browser results: ', browser.getResults());
+        console.log('Taser results: ', browsers);
+        taserReporter({ onRunComplete: { browser: browser, result: result } });
     }
 }
 

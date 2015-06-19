@@ -24,12 +24,13 @@ function TaserReporter(baseReporterDecorator, config) {
                 name: browser.name,
                 fullName: browser.fullName
             },
-            testResults: []
+            testResults: [],
+            errors: []
         };
     }
     
-    function onBrowserError() {
-        console.log('Browser error: ', arguments);
+    function onBrowserError(browser, error) {
+        browsers[browser.id].errors.push(error);
     }
 
     function onSpecComplete(browser, testResult) {

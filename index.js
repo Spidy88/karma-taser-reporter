@@ -6,6 +6,7 @@ function TaserReporter(baseReporterDecorator, config) {
 
     var taserReporter = config.taserReporter || function() {};
     var browsers = {};
+    var errors = {};
 
     // This is not a full list of events that can be listened for, only the set we currently care about
     this.onRunStart = onRunStart.bind(this);
@@ -16,6 +17,7 @@ function TaserReporter(baseReporterDecorator, config) {
 
     function onRunStart() {
         browsers = {};
+        errors = {};
     }
     
     function onBrowserStart(browser) {
@@ -24,13 +26,13 @@ function TaserReporter(baseReporterDecorator, config) {
                 name: browser.name,
                 fullName: browser.fullName
             },
-            testResults: [],
-            errors: []
+            testResults: []
         };
     }
     
     function onBrowserError(browser, error) {
-        browsers[browser.id].errors.push(error);
+        errors[browser.id] = errors[browser.id] || [];
+        errors[browser.id].push(error);
     }
 
     function onSpecComplete(browser, testResult) {
@@ -42,6 +44,7 @@ function TaserReporter(baseReporterDecorator, config) {
         var browser;
         
         for( browser in browsers ) {
+            browsers[browser].errors = errors[browser];
             reports.push(browsers[browser]);
         }
         

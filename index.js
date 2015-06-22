@@ -44,7 +44,7 @@ function TaserReporter(baseReporterDecorator, config) {
         var browser;
         
         for( browser in browsers ) {
-            browsers[browser].errors = errors[browser];
+            browsers[browser].errors = errors[browser] || [];
             reports.push(browsers[browser]);
         }
         

@@ -26,7 +26,12 @@ function TaserReporter(baseReporterDecorator, config) {
                 name: browser.name,
                 fullName: browser.fullName
             },
-            testResults: []
+            testResults: {
+                passed: [],
+                ignored: [],
+                failed: []
+            },
+            errors: errors[browser.id] || []
         };
     }
     
@@ -36,7 +41,21 @@ function TaserReporter(baseReporterDecorator, config) {
     }
 
     function onSpecComplete(browser, testResult) {
-        browsers[browser.id].testResults.push(testResult);
+        var category;
+
+        // Set the test result category for this test
+        if( testResult.success ) {
+            category = 'passed';
+        }
+        else if( testResult.ignored ) {
+            category = 'skipped';
+        }
+        else {
+            category = 'failed';
+        }
+
+        // Add the test result to this browsers test results in its proper category
+        browsers[browser.id].testResults[category].push(testResult);
     }
 
     function onRunComplete(browser, result) {
@@ -44,7 +63,6 @@ function TaserReporter(baseReporterDecorator, config) {
         var browser;
         
         for( browser in browsers ) {
-            browsers[browser].errors = errors[browser] || [];
             reports.push(browsers[browser]);
         }
         

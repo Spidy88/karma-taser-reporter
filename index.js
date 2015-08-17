@@ -19,26 +19,38 @@ function TaserReporter(baseReporterDecorator, config) {
         browsers = {};
         errors = {};
     }
-    
-    function onBrowserStart(browser) {
-        browsers[browser.id] = {
-            browser: {
-                name: browser.name,
-                fullName: browser.fullName
-            },
-            testResults: {
-                passed: [],
-                ignored: [],
-                failed: []
-            },
-            errors: errors[browser.id] || []
-        };
-    }
-    
+
+    function makeBrowserRecord (id, name, fullName) {
+        if (errors[id] === undefined) {
+            errors[id] = [];
+        }
+
+        if (browsers[id] === undefined) {
+            browsers[id] = {
+                browser: {
+                    name: name,
+                    fullName: fullName
+                },
+                testResults: {
+                    passed: [],
+                    ignored: [],
+                    failed: []
+                },
+                errors: errors[id]
+            };
+        }
+    } 
+
     function onBrowserError(browser, error) {
+        makeBrowserRecord(browser.id, browser.name, browser.fullName);
         errors[browser.id] = errors[browser.id] || [];
-        errors[browser.id].push(error);
+        errors[browser.id].push(error.replace(/\.js\?[a-f0-9]+\:/gi, '.js:'));
     }
+
+    function onBrowserStart(browser, error) {
+        makeBrowserRecord(browser.id, browser.name, browser.fullName);
+    }
+
 
     function onSpecComplete(browser, testResult) {
         var category;
@@ -54,6 +66,17 @@ function TaserReporter(baseReporterDecorator, config) {
             category = 'failed';
         }
 
+        if (testResult.log instanceof Array && testResult.log.length > 0) {
+            testResult.log = testResult.log.map(function(ea) {
+                if (ea.match('.js')) {
+                    ea = ea.replace(/\.js\?[a-f0-9]+\:/gi, '.js:'); // Clean out the hash to make it pretty.
+                } else {
+                    ea = ea.replace(/\n    at.+/gi, ''); // Remove browserify junk if we must. :/
+                }
+                return ea;
+            });
+        }
+        
         // Add the test result to this browsers test results in its proper category
         browsers[browser.id].testResults[category].push(testResult);
     }
@@ -61,7 +84,7 @@ function TaserReporter(baseReporterDecorator, config) {
     function onRunComplete(browser, result) {
         var reports = [];
         var browser;
-        
+
         for( browser in browsers ) {
             reports.push(browsers[browser]);
         }

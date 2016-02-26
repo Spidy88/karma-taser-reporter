@@ -33,7 +33,7 @@ function TaserReporter(baseReporterDecorator, config) {
                 },
                 testResults: {
                     passed: [],
-                    ignored: [],
+                    skipped: [],
                     failed: []
                 },
                 errors: errors[id]
@@ -59,7 +59,7 @@ function TaserReporter(baseReporterDecorator, config) {
         if( testResult.success ) {
             category = 'passed';
         }
-        else if( testResult.ignored ) {
+        else if( testResult.skipped || testResult.ignored ) {
             category = 'skipped';
         }
         else {

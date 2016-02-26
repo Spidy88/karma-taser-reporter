@@ -1,6 +1,6 @@
 {
   "name": "karma-taser-reporter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Karma reporter for Taser formatted reports",
   "main": "index.js",
   "scripts": {

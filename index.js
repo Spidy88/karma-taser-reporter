@@ -12,6 +12,7 @@ function TaserReporter(baseReporterDecorator, config, formatError) {
     this.onRunStart = onRunStart.bind(this);
     this.onBrowserStart = onBrowserStart.bind(this);
     this.onBrowserError = onBrowserError.bind(this);
+    this.onBrowserComplete = onBrowserComplete.bind(this);
     this.onSpecComplete = onSpecComplete.bind(this);
     this.onRunComplete = onRunComplete.bind(this);
 
@@ -49,6 +50,15 @@ function TaserReporter(baseReporterDecorator, config, formatError) {
 
     function onBrowserStart(browser, error) {
         makeBrowserRecord(browser.id, browser.name, browser.fullName);
+    }
+
+    function onBrowserComplete(browser) {
+        // This will get caught by `onBrowserError` in the new version of karma, but until then:
+        if (browser.lastResult.disconnected) {
+            makeBrowserRecord(browser.id, browser.name, browser.fullName);
+            errors[browser.id] = errors[browser.id] || [];
+            errors[browser.id].push('A test timed out after ' + browser.lastResult.totalTime + 'ms, likely due to an infinite loop or very high time complexity.');
+        }
     }
 
 

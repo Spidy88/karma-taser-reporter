@@ -1,6 +1,6 @@
 // inject karma runner baseReporter and config
-TaserReporter.$inject = ['baseReporterDecorator', 'config'];
-function TaserReporter(baseReporterDecorator, config) {
+TaserReporter.$inject = ['baseReporterDecorator', 'config', 'formatError'];
+function TaserReporter(baseReporterDecorator, config, formatError) {
     // extend the base reporter
     baseReporterDecorator(this);
 
@@ -44,7 +44,7 @@ function TaserReporter(baseReporterDecorator, config) {
     function onBrowserError(browser, error) {
         makeBrowserRecord(browser.id, browser.name, browser.fullName);
         errors[browser.id] = errors[browser.id] || [];
-        errors[browser.id].push(error.replace(/\.js\?[a-f0-9]+\:/gi, '.js:'));
+        errors[browser.id].push(formatError(error));
     }
 
     function onBrowserStart(browser, error) {
@@ -67,14 +67,7 @@ function TaserReporter(baseReporterDecorator, config) {
         }
 
         if (testResult.log instanceof Array && testResult.log.length > 0) {
-            testResult.log = testResult.log.map(function(ea) {
-                if (ea.match('.js')) {
-                    ea = ea.replace(/\.js\?[a-f0-9]+\:/gi, '.js:'); // Clean out the hash to make it pretty.
-                } else {
-                    ea = ea.replace(/\n    at.+/gi, ''); // Remove browserify junk if we must. :/
-                }
-                return ea;
-            });
+            testResult.log = testResult.log.map(formatError);
         }
         
         // Add the test result to this browsers test results in its proper category

@@ -45,7 +45,7 @@ function TaserReporter(baseReporterDecorator, config, formatError) {
     function onBrowserError(browser, error) {
         makeBrowserRecord(browser.id, browser.name, browser.fullName);
         errors[browser.id] = errors[browser.id] || [];
-        errors[browser.id].push(formatError(error));
+        errors[browser.id].push(betterFormatError(error));
     }
 
     function onBrowserStart(browser, error) {
@@ -77,7 +77,7 @@ function TaserReporter(baseReporterDecorator, config, formatError) {
         }
 
         if (testResult.log instanceof Array && testResult.log.length > 0) {
-            testResult.log = testResult.log.map(formatError);
+            testResult.log = testResult.log.map(betterFormatError);
         }
         
         // Add the test result to this browsers test results in its proper category
@@ -93,6 +93,13 @@ function TaserReporter(baseReporterDecorator, config, formatError) {
         }
         
         taserReporter(reports);
+    }
+
+    function betterFormatError(error) {
+        if (error.match(/Maximum call stack size exceeded./)) {
+            return 'Maximum call stack size exceeded.';
+        }
+        return formatError(error);
     }
 }
 
